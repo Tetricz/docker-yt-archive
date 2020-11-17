@@ -29,7 +29,6 @@ runChannels()
             echo "[debug] checking ${channelName}"
             LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o /ytdl/${channelName}/${NAMING_CONVENTION} ${channelUrl} &
             echo $! > "/tmp/pid.${n}"
-            ps -p $!
         }
         else
             echo "[debug] checking ${channelName}"
@@ -39,7 +38,7 @@ runChannels()
                 rm /tmp/pid.${n}
                 echo "[debug] checking ${channelName}"
                 LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o /ytdl/${channelName}/${NAMING_CONVENTION} ${channelUrl} &
-                echo "$!" > "/tmp/pid.${n}"
+                echo $! > "/tmp/pid.${n}"
             fi
         fi
         let n=n+1;
@@ -73,5 +72,6 @@ while true
 do
     trap graceful_exit SIGTERM SIGKILL SIGINT
     runChannels
+    cp -vf "/tmp/.downloaded" "/config/.downloaded"
     sleep ${TIME_INTERVAL}
 done

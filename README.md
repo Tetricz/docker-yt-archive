@@ -24,6 +24,8 @@ services:
          - QUIET="TRUE"
          - UID="1000"
          - GID="1000"
+        tmpfs:
+         - /tmp:rw,noexec,nosuid,size=1g
 ```
 ### Docker Run
 ```
