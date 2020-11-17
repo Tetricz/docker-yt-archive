@@ -1,0 +1,29 @@
+FROM debian:buster-slim
+
+LABEL maintainer="github.com/Tetricz"
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+ENV UID="1000" \
+ GID="1000" \
+ TIME_INTERVAL="600" \
+ COOKIES="false" \
+ QUIET="TRUE" \
+ FORMAT="bestvideo+bestaudio/best" \
+ NAMING_CONVENTION="%(format_id)s-%(title)s.%(ext)s" \
+ PROXY= \
+ DATE=
+
+RUN apt-get update && apt-get install -y bash dos2unix python curl ffmpeg procps locales && rm -rf /var/lib/apt/lists/* \
+    && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8
+ENV LANG en_US.utf8
+
+RUN mkdir -p /config/ && \
+ mkdir -p /ytdl/ && \
+ curl -L https://github.com/ytdl-org/youtube-dl/releases/download/2020.11.17/youtube-dl -o /usr/bin/youtube-dl
+
+ADD ./entrypoint.bash ./
+ADD ./data/* ./
+RUN chmod a+rx ./entrypoint.bash /usr/bin/youtube-dl
+
+ENTRYPOINT ["./entrypoint.bash"]
