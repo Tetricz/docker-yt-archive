@@ -13,8 +13,8 @@ version: '3'
 services:
     yt-dl:
         restart: unless-stopped
-        container_name: yt-dl
-        image: tetricz/yt-dl
+        container_name: yt-archive
+        image: tetricz/yt-archive
         volumes:
          - </your/directory>:/config
          - </your/directory>:/ytdl
@@ -29,5 +29,5 @@ services:
 ```
 ### Docker Run
 ```
-docker run -dit --tmpfs /tmp:rw,noexec,nosuid,size=1g -v </your/directory>:/ytdl -v </your/directory>:/config --name yt-dl tetricz/yt-dl
+docker run -dit --tmpfs /tmp:rw,noexec,nosuid,size=1g -v </your/directory>:/ytdl -v </your/directory>:/config --name yt-archive tetricz/yt-archive
 ```
