@@ -1,17 +1,43 @@
 #!/bin/bash
-currentver="$(/usr/bin/youtube-dl --version)";
-echo "youtube-dl version $currentver installed"
+/usr/bin/youtube-dl --version
 
 chown -R ${UID}:${GID} /config/
 chown -R ${UID}:${GID} /ytdl/
 
-graceful_exit()
+graceful_exit() #copy download archive and remove files in ram
 {
-    echo "[debug] Shutting down..."
     cp -vf "/tmp/.downloaded" "/config/.downloaded"
-    echo "[debug] Clearing temp files"
-    rm /tmp/*
+    echo "Clearing temp files"
+    rm -fr /tmp/*
+    echo "Shutting down..."
     exit 0
+}
+
+completion_check() #this is mainly to facilitate the copying of the download archive once a process finishes
+{
+    if test -f "/tmp/wait.lock"; then
+        exit
+    fi
+    touch "/tmp/wait.lock"
+    sleep 15
+    m=0;
+    for f in "/tmp/pids/*"
+    do
+        pidstring=$(cat $f|sort -n)
+        IFS=$'\n' read -rd '' -a pidarray <<< "$pidstring";
+        for i in "${pidarray[@]}"
+        do
+            if ps -p $i > /dev/null; then
+                while [ -e /proc/$i ]; do sleep 0.1; done
+                echo "Process ${i} has finished" && cp -f "/tmp/.downloaded" "/config/.downloaded"
+                rm -f "/tmp/pids/pid.${m}"
+            else
+                rm -f "/tmp/pids/pid.${m}"
+            fi
+            let m=m+1;
+        done
+    done
+    rm -f "/tmp/wait.lock"
 }
 
 runChannels()
@@ -24,21 +50,21 @@ runChannels()
         readarray -d " " -t strarr <<< "$line"
         channelUrl=$(echo "${strarr[0]}" | tr -d '\n')
         channelName=$(echo "${strarr[1]}" | tr -d '\n')
-        if ! test -f "/tmp/pid.${n}"; then
+        if ! test -f "/tmp/pids/pid.${n}"; then
         {
-            echo "[debug] checking ${channelName}"
+            echo "[debug] starting ${channelName}"
             LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o /ytdl/${channelName}/${NAMING_CONVENTION} ${channelUrl} &
-            echo $! > "/tmp/pid.${n}"
+            echo $! > "/tmp/pids/pid.${n}"
         }
         else
-            echo "[debug] checking ${channelName}"
-            if ps -p $(cat /tmp/pid.${n}) > /dev/null; then
+            #this is a backup check if the process is completed but not yet caught by the completion check
+            if ps -p $(cat /tmp/pids/pid.${n}) > /dev/null; then
                 echo "[debug] ${channelName} still running... SKIPPING"
             else
-                rm /tmp/pid.${n}
-                echo "[debug] checking ${channelName}"
+                rm -f /tmp/pids/pid.${n}
+                echo "[debug] starting ${channelName}"
                 LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o /ytdl/${channelName}/${NAMING_CONVENTION} ${channelUrl} &
-                echo $! > "/tmp/pid.${n}"
+                echo $! > "/tmp/pids/pid.${n}"
             fi
         fi
         let n=n+1;
@@ -67,11 +93,12 @@ else
     quiet_mode="";
 fi
 cp -vf "/config/.downloaded" "/tmp/.downloaded"
+mkdir -p /tmp/pids/
 
+trap graceful_exit SIGTERM SIGKILL SIGINT
 while true
 do
-    trap graceful_exit SIGTERM SIGKILL SIGINT
     runChannels
-    cp -vf "/tmp/.downloaded" "/config/.downloaded"
+    completion_check &
     sleep ${TIME_INTERVAL}
 done
