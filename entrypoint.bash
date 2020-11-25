@@ -19,7 +19,7 @@ completion_check() #this is mainly to facilitate the copying of the download arc
         exit
     fi
     touch "/tmp/wait.lock"
-    sleep 15
+    sleep 25
     m=0;
     for f in "/tmp/pids/*"
     do
