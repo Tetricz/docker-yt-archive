@@ -5,7 +5,7 @@ If you happen to enable cookies, make sure there is a cookies.txt file in your a
 volume mapping
 ```
 /your/directory:/config/   (channels.txt and .downloaded archive)
-/your/directory:/ytdl/     (the folders for the youtube channels)
+/your/directory:/data/     (the folders for the youtube channels)
 ```
 ### Docker Compose
 ```
@@ -17,7 +17,7 @@ services:
         image: tetricz/yt-archive
         volumes:
          - </your/directory>:/config
-         - </your/directory>:/ytdl
+         - </your/directory>:/data
         environment:
          - COOKIES="FALSE"
          - TIME_INTERVAL="600"
@@ -29,5 +29,5 @@ services:
 ```
 ### Docker Run
 ```
-docker run -dit --tmpfs /tmp:rw,noexec,nosuid,size=1g -v </your/directory>:/ytdl -v </your/directory>:/config --name yt-archive tetricz/yt-archive
+docker run -dit --tmpfs /tmp:rw,noexec,nosuid,size=1g -v </your/directory>:/data -v </your/directory>:/config --name yt-archive tetricz/yt-archive
 ```

@@ -2,7 +2,7 @@
 /usr/bin/youtube-dl --version
 
 chown -R ${UID}:${GID} /config/
-chown -R ${UID}:${GID} /ytdl/
+chown -R ${UID}:${GID} /data/
 
 graceful_exit() #copy download archive and remove files in ram
 {
@@ -53,7 +53,7 @@ runChannels()
         if ! test -f "/tmp/pids/pid.${n}"; then
         {
             echo "[debug] starting ${channelName}"
-            LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o /ytdl/${channelName}/${NAMING_CONVENTION} ${channelUrl} &
+            LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o /data/${channelName}/${NAMING_CONVENTION} ${channelUrl} &
             echo $! > "/tmp/pids/pid.${n}"
         }
         else
@@ -63,7 +63,7 @@ runChannels()
             else
                 rm -f /tmp/pids/pid.${n}
                 echo "[debug] starting ${channelName}"
-                LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o /ytdl/${channelName}/${NAMING_CONVENTION} ${channelUrl} &
+                LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o /data/${channelName}/${NAMING_CONVENTION} ${channelUrl} &
                 echo $! > "/tmp/pids/pid.${n}"
             fi
         fi

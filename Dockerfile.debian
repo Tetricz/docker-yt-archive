@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:stable-slim
 
 LABEL maintainer="github.com/Tetricz"
 
@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y bash dos2unix python curl ffmpeg procps
 ENV LANG en_US.utf8
 
 RUN mkdir -p /config/ && \
- mkdir -p /ytdl/ && \
+ mkdir -p /data/ && \
  curl -L https://github.com/ytdl-org/youtube-dl/releases/download/2021.01.24.1/youtube-dl -o /usr/bin/youtube-dl
 
 ADD ./entrypoint.bash ./
