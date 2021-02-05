@@ -20,7 +20,7 @@ ENV LANG en_US.utf8
 
 RUN mkdir -p /config/ && \
  mkdir -p /data/ && \
- curl -L https://github.com/ytdl-org/youtube-dl/releases/download/2021.01.24.1/youtube-dl -o /usr/bin/youtube-dl
+ curl -L https://github.com/ytdl-org/youtube-dl/releases/download/2021.02.04.1/youtube-dl -o /usr/bin/youtube-dl
 
 ADD ./entrypoint.bash ./
 ADD ./data/* ./
