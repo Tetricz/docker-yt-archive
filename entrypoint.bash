@@ -47,13 +47,13 @@ runChannels()
     n=0;
     while IFS= read -r line
     do
-        readarray -d " " -t strarr <<< "$line"
+        readarray -d "|" -t strarr <<< "$line"
         channelUrl=$(echo "${strarr[0]}" | tr -d '\n')
         channelName=$(echo "${strarr[1]}" | tr -d '\n')
         if ! test -f "/tmp/pids/pid.${n}"; then
         {
             echo "[debug] starting ${channelName}"
-            LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o /data/${channelName}/${NAMING_CONVENTION} ${channelUrl} &
+            LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o "/data/${channelName}/${NAMING_CONVENTION}" ${channelUrl} &
             echo $! > "/tmp/pids/pid.${n}"
         }
         else
@@ -63,7 +63,7 @@ runChannels()
             else
                 rm -f /tmp/pids/pid.${n}
                 echo "[debug] starting ${channelName}"
-                LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o /data/${channelName}/${NAMING_CONVENTION} ${channelUrl} &
+                LC_ALL=en_US.UTF-8 /usr/bin/youtube-dl ${quiet_mode} --download-archive '/tmp/.downloaded' ${cookies_enabled} ${DATE} -f ${FORMAT} -ciw -o "/data/${channelName}/${NAMING_CONVENTION}" ${channelUrl} &
                 echo $! > "/tmp/pids/pid.${n}"
             fi
         fi
