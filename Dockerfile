@@ -3,7 +3,7 @@
 
 FROM alpine:latest as downloader
 # https://github.com/ytdl-org/youtube-dl/releases
-ARG YTDL_VERSION=2021.05.16
+ARG YTDL_VERSION=2021.06.06
 RUN apk add --no-cache curl \
  && curl -L https://github.com/ytdl-org/youtube-dl/releases/download/${YTDL_VERSION}/youtube-dl -o /youtube-dl
 
